@@ -9,6 +9,7 @@ terraform {
       version = "1.2.0"
     }
   }
+  # Optional, set backend type and values. Terraform state will be saved on backend instead
   backend "pg" {
     conn_str = "postgres://terraform_user:mypassword@192.168.254.210/terraform_backend?sslmode=disable"
   }
