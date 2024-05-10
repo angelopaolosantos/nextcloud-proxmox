@@ -1,0 +1,36 @@
+---
+# file: playbook.yaml
+
+- hosts: all
+  gather_facts: false 
+  vars_files:
+    - tf_ansible_vars_file.yaml
+  tasks:
+    - name: Ping my hosts
+      ansible.builtin.ping:
+    - name: Update apt and install snapd
+      apt:
+        update_cache: yes
+        pkg:
+        - squashfuse
+        - snapd
+    - name: Install nextcloud
+      community.general.snap:
+        name:
+          - nextcloud
+      retries: 3
+      delay: 3
+      register: result
+      until: result is not failed
+    - name: Manual install and assign admin user
+      shell:
+        cmd: |
+          nextcloud.manual-install angelo mypassword
+          touch nextcloud-installed.txt
+      args:
+        creates: "~/nextcloud-installed.txt"
+    - name: Add trusted domain
+      shell:
+        cmd: nextcloud.occ config:system:set trusted_domains 1 --value={{private_ip}}
+      
+  
