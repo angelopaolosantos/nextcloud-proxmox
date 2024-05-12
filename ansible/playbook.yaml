@@ -31,6 +31,8 @@
         creates: "~/nextcloud-installed.txt"
     - name: Add trusted domain
       shell:
-        cmd: nextcloud.occ config:system:set trusted_domains 1 --value={{private_ip}}
+        cmd: | 
+          nextcloud.occ config:system:set trusted_domains 1 --value={{private_ip}}
+          nextcloud.occ config:system:set trusted_domains 2 --value=nextcloud.deviantlab.duckdns.org
       
   
