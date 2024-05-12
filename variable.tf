@@ -21,7 +21,7 @@ variable "gateway" {
 
 variable "container_ips" {
     type = string
-    default = "192.168.254.212"
+    default = "192.168.254.214"
 }
 
 variable "network_range" {
@@ -34,6 +34,11 @@ variable "private_key_filename" {
     default = "my-private-key.pem" 
 }
 
+variable "root_password" {
+  type = string
+  default = "mypassword"
+}
+
 variable "node_name" {
     type = string
     default = "pve01"
@@ -41,5 +46,5 @@ variable "node_name" {
 
 variable "vm_id" {
     type = string
-    default = "1002"
+    default = "1004"
 }

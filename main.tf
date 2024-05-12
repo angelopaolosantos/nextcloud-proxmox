@@ -1,4 +1,4 @@
-resource "tls_private_key" "ubuntu_private_key" {
+resource "tls_private_key" "private_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
 
@@ -7,7 +7,7 @@ resource "tls_private_key" "ubuntu_private_key" {
   }
 
   provisioner "local-exec" { # Copy a "myKey.pem" to local computer.
-    command = "echo '${tls_private_key.ubuntu_private_key.private_key_pem}' | tee ${path.cwd}/.ssh/${var.private_key_filename}"
+    command = "echo '${tls_private_key.private_key.private_key_pem}' | tee ${path.cwd}/.ssh/${var.private_key_filename}"
   }
 
   provisioner "local-exec" {
@@ -15,11 +15,11 @@ resource "tls_private_key" "ubuntu_private_key" {
   }
 }
 
-resource "proxmox_virtual_environment_container" "ubuntu_container" {
+resource "proxmox_virtual_environment_container" "nextcloud_container" {
   description = "Managed by Terraform"
   node_name = var.node_name
   vm_id     = var.vm_id
-  tags        = ["terraform", "ubuntu"]
+  tags        = ["terraform", "ubuntu", "homelab"]
 
   initialization {
     hostname = "ubuntu-nextcloud"
@@ -32,9 +32,9 @@ resource "proxmox_virtual_environment_container" "ubuntu_container" {
     }
 
     user_account {
-      keys     = [trimspace(tls_private_key.ubuntu_private_key.public_key_openssh)]
-      # password = random_password.ubuntu_vm_password.result
-      password = "mypassword"
+      keys     = [trimspace(tls_private_key.private_key.public_key_openssh)]
+      # password = random_password.vm_password.result
+      password = var.root_password
     }
   }
 
@@ -43,7 +43,7 @@ resource "proxmox_virtual_environment_container" "ubuntu_container" {
   }
 
   operating_system {
-    template_file_id = proxmox_virtual_environment_download_file.ubuntu-24-04-standard_lxc_img.id
+    template_file_id = proxmox_virtual_environment_download_file.nextcloud_ubuntu_24_04_standard_img.id
     type             = "ubuntu"
   }
 
@@ -74,15 +74,15 @@ resource "proxmox_virtual_environment_container" "ubuntu_container" {
   unprivileged = true
 }
 
-resource "proxmox_virtual_environment_download_file" "ubuntu-24-04-standard_lxc_img" {
+resource "proxmox_virtual_environment_download_file" "nextcloud_ubuntu_24_04_standard_img" {
   content_type = "vztmpl"
   datastore_id = "local"
   node_name    = "pve01"
-  file_name = "nextcloud-ubuntu-24.04-lxc.tar.zst"
+  file_name = "nextcloud-ubuntu-24.04-standard.tar.zst"
   url          = "http://download.proxmox.com/images/system/ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
 }
 
-resource "random_password" "ubuntu_container_password" {
+resource "random_password" "container_password" {
   length           = 16
   override_special = "_%@"
   special          = true
