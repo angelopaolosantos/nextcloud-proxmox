@@ -34,5 +34,6 @@
         cmd: | 
           nextcloud.occ config:system:set trusted_domains 1 --value={{private_ip}}
           nextcloud.occ config:system:set trusted_domains 2 --value=nextcloud.deviantlab.duckdns.org
+          nextcloud.occ config:system:set overwriteprotocol --value 'https'
       
   
